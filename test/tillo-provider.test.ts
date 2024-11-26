@@ -48,7 +48,7 @@ describe('tillo-provider', () => {
   //   const seneca = await makeSeneca()
   //
   //   const list = await seneca.entity("provider/tillo/brand").list$()
-  //   // console.log('BRANDS', list)
+  //   console.log('BRANDS', list)
   //
   //   expect(list.length > 0).toBeTruthy()
   // })
@@ -63,22 +63,18 @@ async function makeSeneca() {
     .use('entity')
     .use('env', {
       // debug: true,
-      file: [__dirname + '/local-env.js;?'],
+      file: [__dirname + '/local-config.js;?'],
       var: {
-        // $TANGOCARD_KEY: String,
-        // $TANGOCARD_NAME: String,
-        // $TANGOCARD_CUSTID: String,
-        // $TANGOCARD_ACCID: String,
+        $TILLO_KEY: String,
+        $TILLO_SECRET: String,
       }
     })
     .use('provider', {
       provider: {
         tillo: {
           keys: {
-            // key: { value: '$TANGOCARD_KEY' },
-            // name: { value: '$TANGOCARD_NAME' },
-            // cust: { value: '$TANGOCARD_CUSTID' },
-            // acc: { value: '$TANGOCARD_ACCID' },
+            key: { value: '$TILLO_KEY' },
+            secret: { value: '$TILLO_SECRET' },
           }
         }
       }

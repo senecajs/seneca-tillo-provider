@@ -1,5 +1,6 @@
 /* Copyright © 2022-2023 Seneca Project Contributors, MIT License. */
 
+const crypto = require('crypto');
 
 const Pkg = require('../package.json')
 
@@ -11,6 +12,20 @@ type TilloProviderOptions = {
   debug: boolean
 }
 
+type TilloSignatureOptions = {
+  apiKey: string
+  apiSecret: string
+  method: string
+  path?: string
+  timestamp: string
+}
+
+
+function getAuthSignature(signData: TilloSignatureOptions) {
+  const authSign = `${signData.apiKey}-${signData.method}-${signData.path}-${signData.timestamp}`
+  const hashedSign = crypto.createHmac('sha256', signData.apiSecret).update(authSign).digest('hex')
+  return hashedSign
+}
 
 function TilloProvider(this: any, options: TilloProviderOptions) {
   const seneca: any = this
@@ -71,10 +86,24 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
         cmd: {
           list: {
             action: async function(this: any, entize: any, msg: any) {
+              const path = "brands"
+              const timestamp = new Date().getTime().toString()
+              const options: TilloSignatureOptions = {
+                apiKey: this.shared.headers["API-Key"],
+                method: "GET",
+                path,
+                timestamp,
+                apiSecret: this.shared.secret
+              }
+
+              this.shared.headers.Signature = getAuthSignature(options)
+              this.shared.headers.Timestamp = timestamp
+              this.shared.headers.Accept = "application/json"
+
               let json: any =
-                await getJSON(makeUrl('catalogs', msg.q), makeConfig())
-              let brands = json.brands
-              let list = brands.map((data: any) => entize(data))
+                await getJSON(makeUrl(path, msg.q), makeConfig())
+              let brands = json.data.brands
+              let list = Object.entries(brands).map(([name, value]: any) => entize({ name, value }))
               return list
             },
           }
@@ -124,22 +153,15 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
     let res =
       await this.post('sys:provider,get:keymap,provider:tillo')
 
-    // if (!res.ok) {
-    //   throw this.fail('keymap')
-    // }
-    //
-    // let src = res.keymap.name.value + ':' + res.keymap.key.value
-    // let auth = Buffer.from(src).toString('base64')
-    //
-    // this.shared.headers = {
-    //   Authorization: 'Basic ' + auth
-    // }
-    //
-    // this.shared.primary = {
-    //   customerIdentifier: res.keymap.cust.value,
-    //   accountIdentifier: res.keymap.acc.value,
-    // }
+    if (!res.ok) {
+      throw this.fail('keymap')
+    }
 
+    this.shared.headers = {
+      'API-Key': res.keymap.key.value,
+    }
+
+    this.shared.secret = res.keymap.secret.value
   })
 
 
@@ -154,7 +176,7 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
 const defaults: TilloProviderOptions = {
 
   // NOTE: include trailing /
-  url: 'https://integration-api.tillo.com/raas/v2/',
+  url: 'https://sandbox.tillo.dev/api/v2/',
 
   // Use global fetch by default - if exists
   fetch: ('undefined' === typeof fetch ? undefined : fetch),

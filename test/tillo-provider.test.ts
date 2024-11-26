@@ -8,8 +8,8 @@ import * as Fs from 'fs'
 const Seneca = require('seneca')
 const SenecaMsgTest = require('seneca-msg-test')
 
-import TangocardProvider from '../src/tangocard-provider'
-import TangocardProviderDoc from '../src/TangocardProvider-doc'
+import TilloProvider from '../src/tillo-provider'
+import TilloProviderDoc from '../src/TilloProvider-doc'
 
 const BasicMessages = require('./basic.messages.js')
 
@@ -21,18 +21,18 @@ if (Fs.existsSync(__dirname + '/local-config.js')) {
 }
 
 
-describe('tangocard-provider', () => {
+describe('tillo-provider', () => {
 
   test('happy', async () => {
-    expect(TangocardProvider).toBeDefined()
-    expect(TangocardProviderDoc).toBeDefined()
+    expect(TilloProvider).toBeDefined()
+    expect(TilloProviderDoc).toBeDefined()
 
     const seneca = await makeSeneca()
 
-    expect(await seneca.post('sys:provider,provider:tangocard,get:info'))
+    expect(await seneca.post('sys:provider,provider:tillo,get:info'))
       .toMatchObject({
         ok: true,
-        name: 'tangocard',
+        name: 'tillo',
       })
   })
 
@@ -43,15 +43,15 @@ describe('tangocard-provider', () => {
   })
 
 
-  test('list-brand', async () => {
-    if (!Config) return;
-    const seneca = await makeSeneca()
-
-    const list = await seneca.entity("provider/tangocard/brand").list$()
-    // console.log('BRANDS', list)
-
-    expect(list.length > 0).toBeTruthy()
-  })
+  // test('list-brand', async () => {
+  //   if (!Config) return;
+  //   const seneca = await makeSeneca()
+  //
+  //   const list = await seneca.entity("provider/tillo/brand").list$()
+  //   // console.log('BRANDS', list)
+  //
+  //   expect(list.length > 0).toBeTruthy()
+  // })
 
 })
 
@@ -65,25 +65,25 @@ async function makeSeneca() {
       // debug: true,
       file: [__dirname + '/local-env.js;?'],
       var: {
-        $TANGOCARD_KEY: String,
-        $TANGOCARD_NAME: String,
-        $TANGOCARD_CUSTID: String,
-        $TANGOCARD_ACCID: String,
+        // $TANGOCARD_KEY: String,
+        // $TANGOCARD_NAME: String,
+        // $TANGOCARD_CUSTID: String,
+        // $TANGOCARD_ACCID: String,
       }
     })
     .use('provider', {
       provider: {
-        tangocard: {
+        tillo: {
           keys: {
-            key: { value: '$TANGOCARD_KEY' },
-            name: { value: '$TANGOCARD_NAME' },
-            cust: { value: '$TANGOCARD_CUSTID' },
-            acc: { value: '$TANGOCARD_ACCID' },
+            // key: { value: '$TANGOCARD_KEY' },
+            // name: { value: '$TANGOCARD_NAME' },
+            // cust: { value: '$TANGOCARD_CUSTID' },
+            // acc: { value: '$TANGOCARD_ACCID' },
           }
         }
       }
     })
-    .use(TangocardProvider, {
+    .use(TilloProvider, {
       // fetch: Fetch,
     })
 

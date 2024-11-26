@@ -4,7 +4,7 @@
 const Pkg = require('../package.json')
 
 
-type TangocardProviderOptions = {
+type TilloProviderOptions = {
   url: string
   fetch: any
   entity: Record<string, any>
@@ -12,7 +12,7 @@ type TangocardProviderOptions = {
 }
 
 
-function TangocardProvider(this: any, options: TangocardProviderOptions) {
+function TilloProvider(this: any, options: TilloProviderOptions) {
   const seneca: any = this
 
   const makeUtils = this.export('provider/makeUtils')
@@ -23,13 +23,13 @@ function TangocardProvider(this: any, options: TangocardProviderOptions) {
     postJSON,
     entityBuilder
   } = makeUtils({
-    name: 'tangocard',
+    name: 'tillo',
     url: options.url,
   })
 
 
   seneca
-    .message('sys:provider,provider:tangocard,get:info', get_info)
+    .message('sys:provider,provider:tillo,get:info', get_info)
 
 
   const makeConfig = (config?: any) => seneca.util.deep({
@@ -43,7 +43,7 @@ function TangocardProvider(this: any, options: TangocardProviderOptions) {
   async function get_info(this: any, _msg: any) {
     return {
       ok: true,
-      name: 'tangocard',
+      name: 'tillo',
       version: Pkg.version,
     }
   }
@@ -51,7 +51,7 @@ function TangocardProvider(this: any, options: TangocardProviderOptions) {
 
   entityBuilder(this, {
     provider: {
-      name: 'tangocard'
+      name: 'tillo'
     },
     entity: {
       customer: {
@@ -122,23 +122,23 @@ function TangocardProvider(this: any, options: TangocardProviderOptions) {
 
   seneca.prepare(async function(this: any) {
     let res =
-      await this.post('sys:provider,get:keymap,provider:tangocard')
+      await this.post('sys:provider,get:keymap,provider:tillo')
 
-    if (!res.ok) {
-      throw this.fail('keymap')
-    }
-
-    let src = res.keymap.name.value + ':' + res.keymap.key.value
-    let auth = Buffer.from(src).toString('base64')
-
-    this.shared.headers = {
-      Authorization: 'Basic ' + auth
-    }
-
-    this.shared.primary = {
-      customerIdentifier: res.keymap.cust.value,
-      accountIdentifier: res.keymap.acc.value,
-    }
+    // if (!res.ok) {
+    //   throw this.fail('keymap')
+    // }
+    //
+    // let src = res.keymap.name.value + ':' + res.keymap.key.value
+    // let auth = Buffer.from(src).toString('base64')
+    //
+    // this.shared.headers = {
+    //   Authorization: 'Basic ' + auth
+    // }
+    //
+    // this.shared.primary = {
+    //   customerIdentifier: res.keymap.cust.value,
+    //   accountIdentifier: res.keymap.acc.value,
+    // }
 
   })
 
@@ -151,10 +151,10 @@ function TangocardProvider(this: any, options: TangocardProviderOptions) {
 
 
 // Default options.
-const defaults: TangocardProviderOptions = {
+const defaults: TilloProviderOptions = {
 
   // NOTE: include trailing /
-  url: 'https://integration-api.tangocard.com/raas/v2/',
+  url: 'https://integration-api.tillo.com/raas/v2/',
 
   // Use global fetch by default - if exists
   fetch: ('undefined' === typeof fetch ? undefined : fetch),
@@ -172,10 +172,10 @@ const defaults: TangocardProviderOptions = {
 }
 
 
-Object.assign(TangocardProvider, { defaults })
+Object.assign(TilloProvider, { defaults })
 
-export default TangocardProvider
+export default TilloProvider
 
 if ('undefined' !== typeof (module)) {
-  module.exports = TangocardProvider
+  module.exports = TilloProvider
 }

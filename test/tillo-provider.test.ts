@@ -53,6 +53,20 @@ describe('tillo-provider', () => {
   //   expect(list.length > 0).toBeTruthy()
   // })
 
+  // test('issue-gc', async () => {
+  //   if (!Config) return;
+  //   const seneca = await makeSeneca()
+  //
+  //   const redeemTemplate = await seneca.entity("provider/tillo/digitalGC").save$({
+  //     user_id: "user01",
+  //     brand: "hobbycraft",
+  //     value: 10.00,
+  //   })
+  //   console.log('REDEEM TEMPLATE ', redeemTemplate)
+  //
+  //   expect(redeemTemplate).toBeTruthy()
+  // })
+
 })
 
 

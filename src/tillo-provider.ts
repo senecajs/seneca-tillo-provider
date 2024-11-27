@@ -12,18 +12,24 @@ type TilloProviderOptions = {
   debug: boolean
 }
 
-type TilloSignatureOptions = {
-  apiKey: string
-  apiSecret: string
-  method: string
-  path?: string
-  timestamp: string
+function generateAuthSign(signData: Map<string, string>) {
+  const sd = new Map(signData)
+  sd.delete("apiSecret")
+  const sdList: any = []
+
+
+  sd.forEach((v: any) => {
+    sdList.push(v)
+  })
+
+  return sdList.join('-')
 }
 
+function getAuthSignature(signData: Map<string, string>) {
+  const authSign = generateAuthSign(signData)
 
-function getAuthSignature(signData: TilloSignatureOptions) {
-  const authSign = `${signData.apiKey}-${signData.method}-${signData.path}-${signData.timestamp}`
-  const hashedSign = crypto.createHmac('sha256', signData.apiSecret).update(authSign).digest('hex')
+  const hashedSign = crypto.createHmac('sha256', signData.get("apiSecret"))
+    .update(authSign).digest('hex')
   return hashedSign
 }
 
@@ -69,39 +75,27 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
       name: 'tillo'
     },
     entity: {
-      customer: {
-        cmd: {
-          list: {
-            action: async function(this: any, entize: any, msg: any) {
-              let json: any =
-                await getJSON(makeUrl('customers', msg.q), makeConfig())
-              let customers = json
-              let list = customers.map((data: any) => entize(data))
-              return list
-            },
-          }
-        }
-      },
       brand: {
         cmd: {
           list: {
             action: async function(this: any, entize: any, msg: any) {
               const path = "brands"
               const timestamp = new Date().getTime().toString()
-              const options: TilloSignatureOptions = {
-                apiKey: this.shared.headers["API-Key"],
-                method: "GET",
-                path,
-                timestamp,
-                apiSecret: this.shared.secret
-              }
+
+              const options: Map<string, string> = new Map([
+                ["apikey", this.shared.headers["API-Key"]],
+                ["method", "GET"],
+                ["path", path],
+                ["timestamp", timestamp],
+                ["apiSecret", this.shared.secret],
+              ])
 
               this.shared.headers.Signature = getAuthSignature(options)
               this.shared.headers.Timestamp = timestamp
               this.shared.headers.Accept = "application/json"
 
               let json: any =
-                await getJSON(makeUrl(path, msg.q), makeConfig())
+                await getJSON(makeUrl(path + "?detail=true", msg.q), makeConfig())
               let brands = json.data.brands
               let list = Object.entries(brands).map(([name, value]: any) => entize({ name, value }))
               return list
@@ -109,36 +103,49 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
           }
         }
       },
-      order: {
+      digitalGC: {
         cmd: {
-          list: {
-            action: async function(this: any, entize: any, msg: any) {
-              let json: any =
-                await getJSON(makeUrl('orders', msg.q), makeConfig())
-              let orders = json.orders
-              let list = orders.map((data: any) => entize(data))
-
-              // TODO: ensure seneca-transport preserves array props
-              list.page = json.page
-
-              return list
-            },
-          },
           save: {
             action: async function(this: any, entize: any, msg: any) {
-              let body = this.util.deep(
-                this.shared.primary,
-                options.entity.order.save,
-                msg.ent.data$(false)
-              )
+              const timestamp = new Date().getTime().toString()
+              const clientRequestId = `${msg.q.user_id}-digitalissue-${timestamp}`
+              const brand = msg.q.brand
+              const currency = msg.q?.currency || "GBP"
+              const value = msg.q.value
+              const sector = msg.q?.sector || "other"
+
+              const options: Map<string, string> = new Map([
+                ["apikey", this.shared.headers["API-Key"]],
+                ["method", "POST"],
+                ["path", "digital-issue"],
+                ["clientRequestId", clientRequestId],
+                ["brand", brand],
+                ["currency", currency],
+                ["value", value],
+                ["timestamp", timestamp],
+                ["apiSecret", this.shared.secret],
+              ])
+
+              this.shared.headers.Signature = getAuthSignature(options)
+              this.shared.headers.Timestamp = timestamp
+              this.shared.headers.Accept = "application/json"
 
               let json: any =
-                await postJSON(makeUrl('orders', msg.q), makeConfig({
-                  body
+                await postJSON(makeUrl('digital/issue'), makeConfig({
+                  body: {
+                    client_request_id: clientRequestId,
+                    brand: brand,
+                    face_value: {
+                      amount: value,
+                      currency,
+                    },
+                    delivery_method: 'url',
+                    fulfilment_by: 'partner',
+                    sector: sector
+                  }
                 }))
 
               let order = json
-              order.id = order.referenceOrderID
               return entize(order)
             },
           }

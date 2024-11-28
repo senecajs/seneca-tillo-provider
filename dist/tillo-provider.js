@@ -50,14 +50,14 @@ function TilloProvider(options) {
                         action: async function (entize, msg) {
                             const path = "brands";
                             const timestamp = new Date().getTime().toString();
-                            const options = new Map([
+                            const signData = new Map([
                                 ["apikey", this.shared.headers["API-Key"]],
                                 ["method", "GET"],
                                 ["path", path],
                                 ["timestamp", timestamp],
                                 ["apiSecret", this.shared.secret],
                             ]);
-                            this.shared.headers.Signature = getAuthSignature(options);
+                            this.shared.headers.Signature = getAuthSignature(signData);
                             this.shared.headers.Timestamp = timestamp;
                             this.shared.headers.Accept = "application/json";
                             let json = await getJSON(makeUrl(path + "?detail=true", msg.q), makeConfig());
@@ -68,42 +68,39 @@ function TilloProvider(options) {
                     }
                 }
             },
-            digitalGC: {
+            dgc: {
                 cmd: {
                     save: {
                         action: async function (entize, msg) {
-                            var _a, _b;
                             const timestamp = new Date().getTime().toString();
-                            const clientRequestId = `${msg.q.user_id}-digitalissue-${timestamp}`;
-                            const brand = msg.q.brand;
-                            const currency = ((_a = msg.q) === null || _a === void 0 ? void 0 : _a.currency) || "GBP";
-                            const value = msg.q.value;
-                            const sector = ((_b = msg.q) === null || _b === void 0 ? void 0 : _b.sector) || "other";
-                            const options = new Map([
+                            const { clientRequestId, brand, currency, value, sector } = msg.q;
+                            const clientRId = clientRequestId || `${msg.q.user_id}-digitalissue-${timestamp}`;
+                            const curr = currency || "GBP";
+                            const signData = new Map([
                                 ["apikey", this.shared.headers["API-Key"]],
                                 ["method", "POST"],
                                 ["path", "digital-issue"],
-                                ["clientRequestId", clientRequestId],
+                                ["clientRequestId", clientRId],
                                 ["brand", brand],
-                                ["currency", currency],
+                                ["currency", curr],
                                 ["value", value],
                                 ["timestamp", timestamp],
                                 ["apiSecret", this.shared.secret],
                             ]);
-                            this.shared.headers.Signature = getAuthSignature(options);
+                            this.shared.headers.Signature = getAuthSignature(signData);
                             this.shared.headers.Timestamp = timestamp;
                             this.shared.headers.Accept = "application/json";
                             let json = await postJSON(makeUrl('digital/issue'), makeConfig({
                                 body: {
-                                    client_request_id: clientRequestId,
+                                    client_request_id: clientRId,
                                     brand: brand,
                                     face_value: {
                                         amount: value,
-                                        currency,
+                                        currency: curr,
                                     },
                                     delivery_method: 'url',
                                     fulfilment_by: 'partner',
-                                    sector: sector
+                                    sector: sector || "other"
                                 }
                             }));
                             let order = json;

@@ -82,7 +82,7 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
               const path = "brands"
               const timestamp = new Date().getTime().toString()
 
-              const options: Map<string, string> = new Map([
+              const signData: Map<string, string> = new Map([
                 ["apikey", this.shared.headers["API-Key"]],
                 ["method", "GET"],
                 ["path", path],
@@ -90,7 +90,7 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
                 ["apiSecret", this.shared.secret],
               ])
 
-              this.shared.headers.Signature = getAuthSignature(options)
+              this.shared.headers.Signature = getAuthSignature(signData)
               this.shared.headers.Timestamp = timestamp
               this.shared.headers.Accept = "application/json"
 
@@ -103,45 +103,45 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
           }
         }
       },
-      digitalGC: {
+      dgc: {
         cmd: {
           save: {
             action: async function(this: any, entize: any, msg: any) {
               const timestamp = new Date().getTime().toString()
-              const clientRequestId = `${msg.q.user_id}-digitalissue-${timestamp}`
-              const brand = msg.q.brand
-              const currency = msg.q?.currency || "GBP"
-              const value = msg.q.value
-              const sector = msg.q?.sector || "other"
 
-              const options: Map<string, string> = new Map([
+              const { clientRequestId, brand, currency, value, sector } = msg.q
+
+              const clientRId = clientRequestId || `${msg.q.user_id}-digitalissue-${timestamp}`
+              const curr = currency || "GBP"
+
+              const signData: Map<string, string> = new Map([
                 ["apikey", this.shared.headers["API-Key"]],
                 ["method", "POST"],
                 ["path", "digital-issue"],
-                ["clientRequestId", clientRequestId],
+                ["clientRequestId", clientRId],
                 ["brand", brand],
-                ["currency", currency],
+                ["currency", curr],
                 ["value", value],
                 ["timestamp", timestamp],
                 ["apiSecret", this.shared.secret],
               ])
 
-              this.shared.headers.Signature = getAuthSignature(options)
+              this.shared.headers.Signature = getAuthSignature(signData)
               this.shared.headers.Timestamp = timestamp
               this.shared.headers.Accept = "application/json"
 
               let json: any =
                 await postJSON(makeUrl('digital/issue'), makeConfig({
                   body: {
-                    client_request_id: clientRequestId,
+                    client_request_id: clientRId,
                     brand: brand,
                     face_value: {
                       amount: value,
-                      currency,
+                      currency: curr,
                     },
                     delivery_method: 'url',
                     fulfilment_by: 'partner',
-                    sector: sector
+                    sector: sector || "other"
                   }
                 }))
 

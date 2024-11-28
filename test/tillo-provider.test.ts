@@ -57,7 +57,7 @@ describe('tillo-provider', () => {
   //   if (!Config) return;
   //   const seneca = await makeSeneca()
   //
-  //   const redeemTemplate = await seneca.entity("provider/tillo/digitalGC").save$({
+  //   const redeemTemplate = await seneca.entity("provider/tillo/dgc").save$({
   //     user_id: "user01",
   //     brand: "hobbycraft",
   //     value: 10.00,

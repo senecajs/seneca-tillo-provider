@@ -74,7 +74,8 @@ function TilloProvider(options) {
                         action: async function (entize, msg) {
                             const timestamp = new Date().getTime().toString();
                             const { clientRequestId, brand, currency, value, sector } = msg.q;
-                            const clientRId = clientRequestId || `${msg.q.user_id}-digitalissue-${timestamp}`;
+                            const clientRId = clientRequestId ||
+                                `${msg.q.user_id}-${brand}-digitalissue-${value}-${timestamp}`;
                             const curr = currency || "GBP";
                             const signData = new Map([
                                 ["apikey", this.shared.headers["API-Key"]],
@@ -117,7 +118,7 @@ function TilloProvider(options) {
             throw this.fail('keymap');
         }
         this.shared.headers = {
-            'API-Key': res.keymap.key.value,
+            'API-Key': res.keymap.apikey.value,
         };
         this.shared.secret = res.keymap.secret.value;
     });
@@ -128,7 +129,7 @@ function TilloProvider(options) {
 // Default options.
 const defaults = {
     // NOTE: include trailing /
-    url: 'https://sandbox.tillo.dev/api/v2/',
+    url: 'https://app.tillo.io/',
     // Use global fetch by default - if exists
     fetch: ('undefined' === typeof fetch ? undefined : fetch),
     entity: {

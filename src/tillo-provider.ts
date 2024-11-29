@@ -17,7 +17,6 @@ function generateAuthSign(signData: Map<string, string>) {
   sd.delete("apiSecret")
   const sdList: any = []
 
-
   sd.forEach((v: any) => {
     sdList.push(v)
   })
@@ -111,7 +110,9 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
 
               const { clientRequestId, brand, currency, value, sector } = msg.q
 
-              const clientRId = clientRequestId || `${msg.q.user_id}-digitalissue-${timestamp}`
+              const clientRId = clientRequestId ||
+                `${msg.q.user_id}-${brand}-digitalissue-${value}-${timestamp}`
+
               const curr = currency || "GBP"
 
               const signData: Map<string, string> = new Map([
@@ -165,7 +166,7 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
     }
 
     this.shared.headers = {
-      'API-Key': res.keymap.key.value,
+      'API-Key': res.keymap.apikey.value,
     }
 
     this.shared.secret = res.keymap.secret.value
@@ -183,7 +184,7 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
 const defaults: TilloProviderOptions = {
 
   // NOTE: include trailing /
-  url: 'https://sandbox.tillo.dev/api/v2/',
+  url: 'https://app.tillo.io/',
 
   // Use global fetch by default - if exists
   fetch: ('undefined' === typeof fetch ? undefined : fetch),

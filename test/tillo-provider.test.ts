@@ -83,7 +83,7 @@ async function makeSeneca() {
       // debug: true,
       file: [__dirname + '/local-config.js;?'],
       var: {
-        $TILLO_KEY: String,
+        $TILLO_API_KEY: String,
         $TILLO_SECRET: String,
       }
     })
@@ -91,14 +91,14 @@ async function makeSeneca() {
       provider: {
         tillo: {
           keys: {
-            key: { value: '$TILLO_KEY' },
+            apikey: { value: '$TILLO_API_KEY' },
             secret: { value: '$TILLO_SECRET' },
           }
         }
       }
     })
     .use(TilloProvider, {
-      // fetch: Fetch,
+      url: 'https://sandbox.tillo.dev/api/v2/',
     })
 
   return seneca.ready()

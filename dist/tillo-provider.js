@@ -59,7 +59,6 @@ function TilloProvider(options) {
                             ]);
                             this.shared.headers.Signature = getAuthSignature(signData);
                             this.shared.headers.Timestamp = timestamp;
-                            this.shared.headers.Accept = "application/json";
                             let json = await getJSON(makeUrl(path, msg.q), makeConfig());
                             let brands = json.data.brands;
                             let list = Object.entries(brands).map(([name, value]) => entize({ name, value }));
@@ -90,7 +89,6 @@ function TilloProvider(options) {
                             ]);
                             this.shared.headers.Signature = getAuthSignature(signData);
                             this.shared.headers.Timestamp = timestamp;
-                            this.shared.headers.Accept = "application/json";
                             let json = await postJSON(makeUrl('digital/issue'), makeConfig({
                                 body: {
                                     client_request_id: clientRId,
@@ -119,6 +117,7 @@ function TilloProvider(options) {
         }
         this.shared.headers = {
             'API-Key': res.keymap.apikey.value,
+            Accept: "application/json"
         };
         this.shared.secret = res.keymap.secret.value;
     });

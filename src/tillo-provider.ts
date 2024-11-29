@@ -91,7 +91,6 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
 
               this.shared.headers.Signature = getAuthSignature(signData)
               this.shared.headers.Timestamp = timestamp
-              this.shared.headers.Accept = "application/json"
 
               let json: any =
                 await getJSON(makeUrl(path, msg.q), makeConfig())
@@ -129,7 +128,6 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
 
               this.shared.headers.Signature = getAuthSignature(signData)
               this.shared.headers.Timestamp = timestamp
-              this.shared.headers.Accept = "application/json"
 
               let json: any =
                 await postJSON(makeUrl('digital/issue'), makeConfig({
@@ -167,6 +165,7 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
 
     this.shared.headers = {
       'API-Key': res.keymap.apikey.value,
+      Accept: "application/json"
     }
 
     this.shared.secret = res.keymap.secret.value

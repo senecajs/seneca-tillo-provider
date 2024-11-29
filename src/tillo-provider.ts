@@ -95,7 +95,7 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
               this.shared.headers.Accept = "application/json"
 
               let json: any =
-                await getJSON(makeUrl(path + "?detail=true", msg.q), makeConfig())
+                await getJSON(makeUrl(path, msg.q), makeConfig())
               let brands = json.data.brands
               let list = Object.entries(brands).map(([name, value]: any) => entize({ name, value }))
               return list

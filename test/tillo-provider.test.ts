@@ -47,7 +47,11 @@ describe('tillo-provider', () => {
   //   if (!Config) return;
   //   const seneca = await makeSeneca()
   //
-  //   const list = await seneca.entity("provider/tillo/brand").list$()
+  //   const list = await seneca.entity("provider/tillo/brand").list$({
+  //     detail: true,
+  //     currency: "GBP",
+  //     country: "GB"
+  //   })
   //   console.log('BRANDS', list)
   //
   //   expect(list.length > 0).toBeTruthy()

@@ -60,7 +60,7 @@ function TilloProvider(options) {
                             this.shared.headers.Signature = getAuthSignature(signData);
                             this.shared.headers.Timestamp = timestamp;
                             this.shared.headers.Accept = "application/json";
-                            let json = await getJSON(makeUrl(path + "?detail=true", msg.q), makeConfig());
+                            let json = await getJSON(makeUrl(path, msg.q), makeConfig());
                             let brands = json.data.brands;
                             let list = Object.entries(brands).map(([name, value]) => entize({ name, value }));
                             return list;

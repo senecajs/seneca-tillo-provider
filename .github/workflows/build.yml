@@ -13,8 +13,8 @@ jobs:
   build:
     environment: test
     env:
-      TRELLO_APIKEY: ${{secrets.TRELLO_APIKEY}}
-      TRELLO_USERTOKEN: ${{secrets.TRELLO_USERTOKEN}}
+      TILLO_API_KEY: ${{secrets.TILLO_API_KEY}}}
+      TILLO_SECRET: ${{secrets.TILLO_SECRET}
       
     timeout-minutes: 6
 

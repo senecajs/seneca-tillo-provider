@@ -1,20 +1,20 @@
 {
-  "name": "@seneca/tangocard-provider",
+  "name": "@seneca/tillo-provider",
   "version": "1.0.0",
-  "main": "dist/tangocard-provider.js",
+  "main": "dist/tillo-provider.js",
   "type": "commonjs",
-  "types": "dist/tangocard-provider.d.ts",
-  "description": "Seneca entity provider for the Tangocard API.",
-  "homepage": "https://github.com/senecajs/seneca-tangocard-provider",
+  "types": "dist/tillo-provider.d.ts",
+  "description": "Seneca entity provider for the Tillocard API.",
+  "homepage": "https://github.com/senecajs/seneca-tillo-provider",
   "keywords": [
     "seneca",
-    "tangocard",
-    "tangocard-provider"
+    "tillo",
+    "tillo-provider"
   ],
   "author": "Richard Rodger - richardrodger.com",
   "repository": {
     "type": "git",
-    "url": "git://github.com/senecajs/seneca-tangocard-provider.git"
+    "url": "git://github.com/senecajs/seneca-tillo-provider.git"
   },
   "scripts": {
     "test": "jest --coverage",
@@ -44,7 +44,7 @@
   "peerDependencies": {
     "@seneca/env": ">=0.2",
     "@seneca/provider": ">=1.0",
-    "seneca": ">=3",
+    "seneca": ">=3||>=4.0.0-rc2",
     "seneca-entity": ">=19",
     "seneca-promisify": ">=3"
   },

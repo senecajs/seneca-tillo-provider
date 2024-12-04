@@ -4,7 +4,7 @@
   "main": "dist/tillo-provider.js",
   "type": "commonjs",
   "types": "dist/tillo-provider.d.ts",
-  "description": "Seneca entity provider for the Tillocard API.",
+  "description": "Seneca entity provider for the Tillo API.",
   "homepage": "https://github.com/senecajs/seneca-tillo-provider",
   "keywords": [
     "seneca",

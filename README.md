@@ -1,10 +1,10 @@
-![Seneca Tangocard-Provider](http://senecajs.org/files/assets/seneca-logo.png)
+![Seneca Tillo-Provider](http://senecajs.org/files/assets/seneca-logo.png)
 
-> _Seneca Tangocard-Provider_ is a plugin for [Seneca](http://senecajs.org)
+> _Seneca Tillo-Provider_ is a plugin for [Seneca](http://senecajs.org)
 
 
-Provides access to the Tangocard API using the Seneca *provider*
-convention. Tangocard API entities are represented as Seneca entities so
+Provides access to the Tillo API using the Seneca *provider*
+convention. Tillo API entities are represented as Seneca entities so
 that they can be accessed using the Seneca entity API and messages.
 
 See [seneca-entity](senecajs/seneca-entity) and the [Seneca Data
@@ -13,12 +13,12 @@ Tutorial](https://senecajs.org/docs/tutorials/understanding-data-entities.html) 
 
 NOTE: underlying third party SDK needs to be replaced as out of date and has a security issue.
 
-[![npm version](https://img.shields.io/npm/v/@seneca/tangocard-provider.svg)](https://npmjs.com/package/@seneca/tangocard-provider)
-[![build](https://github.com/senecajs/seneca-tangocard-provider/actions/workflows/build.yml/badge.svg)](https://github.com/senecajs/seneca-tangocard-provider/actions/workflows/build.yml)
-[![Coverage Status](https://coveralls.io/repos/github/senecajs/seneca-tangocard-provider/badge.svg?branch=main)](https://coveralls.io/github/senecajs/seneca-tangocard-provider?branch=main)
-[![Known Vulnerabilities](https://snyk.io/test/github/senecajs/seneca-tangocard-provider/badge.svg)](https://snyk.io/test/github/senecajs/seneca-tangocard-provider)
+[![npm version](https://img.shields.io/npm/v/@seneca/tillo-provider.svg)](https://npmjs.com/package/@seneca/tillo-provider)
+[![build](https://github.com/senecajs/seneca-tillo-provider/actions/workflows/build.yml/badge.svg)](https://github.com/senecajs/seneca-tillo-provider/actions/workflows/build.yml)
+[![Coverage Status](https://coveralls.io/repos/github/senecajs/seneca-tillo-provider/badge.svg?branch=main)](https://coveralls.io/github/senecajs/seneca-tillo-provider?branch=main)
+[![Known Vulnerabilities](https://snyk.io/test/github/senecajs/seneca-tillo-provider/badge.svg)](https://snyk.io/test/github/senecajs/seneca-tillo-provider)
 [![DeepScan grade](https://deepscan.io/api/teams/5016/projects/19462/branches/505954/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=5016&pid=19462&bid=505954)
-[![Maintainability](https://api.codeclimate.com/v1/badges/f76e83896b731bb5d609/maintainability)](https://codeclimate.com/github/senecajs/seneca-tangocard-provider/maintainability)
+[![Maintainability](https://api.codeclimate.com/v1/badges/f76e83896b731bb5d609/maintainability)](https://codeclimate.com/github/senecajs/seneca-tillo-provider/maintainability)
 
 
 | ![Voxgig](https://www.voxgig.com/res/img/vgt01r.png) | This open source module is sponsored and supported by [Voxgig](https://www.voxgig.com). |
@@ -36,38 +36,36 @@ Seneca()
   // Get API keys using the seneca-env plugin
   .use('env', {
     var: {
-      $TANGOCARD_APIKEY: String,
-      $TANGOCARD_USERTOKEN: String,
+      $TILLO_API_KEY: String,
+      $TILLO_SECRET: String,
     }
   })
   .use('provider', {
     provider: {
-      tangocard: {
+      tillo: {
         keys: {
-          apikey: { value: '$TANGOCARD_APIKEY' },
-          usertoken: { value: '$TANGOCARD_USERTOKEN' },
+          apikey: { value: '$TILLO_API_KEY' },
+          secret: { value: '$TILLO_SECRET' },
         }
       }
     }
   })
-  .use('tangocard-provider')
+  .use('tillo-provider')
 
-let board = await seneca.entity('provider/tangocard/board')
-  .load$('<tangocard-board-id>')
+const brands = await seneca.entity("provider/tillo/brand").list$({
+  detail: true,
+  currency: "GBP",
+  country: "GB"
+})
 
-Console.log('BOARD', board)
-
-board.desc = 'New description'
-board = await board.save$()
-
-Console.log('UPDATED BOARD', board)
+console.log('BRANDS', brands)
 
 ```
 
 ## Install
 
 ```sh
-$ npm install @seneca/tangocard-provider @seneca/env
+$ npm install @seneca/tillo-provider @seneca/env
 ```
 
 
@@ -84,7 +82,7 @@ Set plugin options when loading with:
 ```js
 
 
-seneca.use('TangocardProvider', { name: value, ... })
+seneca.use('TilloProvider', { name: value, ... })
 
 
 ```
@@ -102,9 +100,9 @@ seneca.use('TangocardProvider', { name: value, ... })
 
 ## Action Patterns
 
-* [role:entity,base:tangocard,cmd:load,name:repo,zone:provider](#-roleentitybasetangocardcmdloadnamerepozoneprovider-)
-* [role:entity,base:tangocard,cmd:save,name:repo,zone:provider](#-roleentitybasetangocardcmdsavenamerepozoneprovider-)
-* [sys:provider,get:info,provider:tangocard](#-sysprovidergetinfoprovidertangocard-)
+* [role:entity,base:tillo,cmd:load,name:repo,zone:provider](#-roleentitybasetillocmdloadnamerepozoneprovider-)
+* [role:entity,base:tillo,cmd:save,name:repo,zone:provider](#-roleentitybasetillocmdsavenamerepozoneprovider-)
+* [sys:provider,get:info,provider:tillo](#-sysprovidergetinfoprovidertillo-)
 
 
 <!--END:action-list-->
@@ -114,21 +112,21 @@ seneca.use('TangocardProvider', { name: value, ... })
 
 ## Action Descriptions
 
-### &laquo; `role:entity,base:tangocard,cmd:load,name:repo,zone:provider` &raquo;
+### &laquo; `role:entity,base:tillo,cmd:load,name:repo,zone:provider` &raquo;
 
-Load Tangocard repository data into an entity.
-
-
-
-----------
-### &laquo; `role:entity,base:tangocard,cmd:save,name:repo,zone:provider` &raquo;
-
-Update Tangocard repository data from an entity.
+Load Tillo repository data into an entity.
 
 
 
 ----------
-### &laquo; `sys:provider,get:info,provider:tangocard` &raquo;
+### &laquo; `role:entity,base:tillo,cmd:save,name:repo,zone:provider` &raquo;
+
+Update Tillo repository data from an entity.
+
+
+
+----------
+### &laquo; `sys:provider,get:info,provider:tillo` &raquo;
 
 Get information about the provider.
 

@@ -64,11 +64,11 @@ describe('TilloProvider', () => {
   })
 
   test('list-float', async () => {
-    if (!CONFIG.TILLO_API_KEY) return;
+    if (!CONFIG.TILLO_API_KEY) return
     const seneca = await makeSeneca()
 
-    const list = await seneca.entity("provider/tillo/float").list$({
-      currency: "GBP",
+    const list = await seneca.entity('provider/tillo/float').list$({
+      currency: 'GBP',
     })
     console.log('FLOATS', list[0])
 
@@ -76,13 +76,13 @@ describe('TilloProvider', () => {
   })
 
   test('list-brand', async () => {
-    if (!CONFIG.TILLO_API_KEY) return;
+    if (!CONFIG.TILLO_API_KEY) return
     const seneca = await makeSeneca()
 
-    const list = await seneca.entity("provider/tillo/brand").list$({
+    const list = await seneca.entity('provider/tillo/brand').list$({
       detail: true,
-      currency: "GBP",
-      country: "GB"
+      currency: 'GBP',
+      country: 'GB',
     })
     console.log('BRANDS', list)
 
@@ -90,13 +90,13 @@ describe('TilloProvider', () => {
   })
 
   test('issue-gc', async () => {
-    if (!CONFIG.TILLO_API_KEY) return;
+    if (!CONFIG.TILLO_API_KEY) return
     const seneca = await makeSeneca()
 
-    const redeemTemplate = await seneca.entity("provider/tillo/dgc").save$({
-      user_id: "user01",
-      brand: "hobbycraft",
-      value: 10.00,
+    const redeemTemplate = await seneca.entity('provider/tillo/dgc').save$({
+      user_id: 'user01',
+      brand: 'hobbycraft',
+      value: 10.0,
     })
     console.log('REDEEM TEMPLATE ', redeemTemplate)
 

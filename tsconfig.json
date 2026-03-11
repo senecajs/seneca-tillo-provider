@@ -1,20 +1,4 @@
 {
-  "compilerOptions": {
-    "esModuleInterop": true,
-    "isolatedModules": true,
-    "module": "commonjs",
-    "moduleResolution": "nodenext",
-    "noEmitOnError": true,
-    "outDir":"dist",
-    "resolveJsonModule": true,
-    "rootDir":"src",
-    "sourceMap": true,
-    "strict": true,
-    "target": "ES2019"
-  },
-  "exclude": [
-    "test",
-    "dist",
-    "node_modules"
-  ]
+  "files": [],
+  "references": [{ "path": "src" }, { "path": "test" }]
 }

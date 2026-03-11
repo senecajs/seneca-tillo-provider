@@ -1,10 +1,11 @@
 name: "TODO"
-on: ["push"]
+# Disabled: senecajs/todo-to-issue-action@master uses outdated Python dependencies
+# on: ["push"]
 jobs:
   build:
     runs-on: "ubuntu-latest"
     steps:
-      - uses: "actions/checkout@master"
+      - uses: "actions/checkout@v4"
       - name: "todo-to-issue"
         uses: "senecajs/todo-to-issue-action@master"
         with:

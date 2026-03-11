@@ -15,10 +15,10 @@ const testDir = path.join(__dirname, '..', 'test')
 
 const BasicMessages = require(path.join(testDir, 'basic.messages.js'))
 
-// Only run some tests locally (not on Github Actions).
-let Config: any = undefined
+const CONFIG: any = {}
+
 if (Fs.existsSync(path.join(testDir, 'local-config.js'))) {
-  Config = require(path.join(testDir, 'local-config'))
+  Object.assign(CONFIG, require(path.join(testDir, 'local-config')))
 }
 
 describe('TilloProvider', () => {
@@ -63,45 +63,45 @@ describe('TilloProvider', () => {
     assert.equal(dgcEntity.entity$, 'provider/tillo/dgc')
   })
 
-  // test('list-float', async () => {
-  //   if (!Config) return;
-  //   const seneca = await makeSeneca()
-  //
-  //   const list = await seneca.entity("provider/tillo/float").list$({
-  //     currency: "GBP",
-  //   })
-  //   console.log('FLOATS', list[0])
-  //
-  //   assert.ok(list.length > 0)
-  // })
+  test('list-float', async () => {
+    if (!CONFIG.TILLO_API_KEY) return;
+    const seneca = await makeSeneca()
 
-  // test('list-brand', async () => {
-  //   if (!Config) return;
-  //   const seneca = await makeSeneca()
-  //
-  //   const list = await seneca.entity("provider/tillo/brand").list$({
-  //     detail: true,
-  //     currency: "GBP",
-  //     country: "GB"
-  //   })
-  //   console.log('BRANDS', list)
-  //
-  //   assert.ok(list.length > 0)
-  // })
+    const list = await seneca.entity("provider/tillo/float").list$({
+      currency: "GBP",
+    })
+    console.log('FLOATS', list[0])
 
-  // test('issue-gc', async () => {
-  //   if (!Config) return;
-  //   const seneca = await makeSeneca()
-  //
-  //   const redeemTemplate = await seneca.entity("provider/tillo/dgc").save$({
-  //     user_id: "user01",
-  //     brand: "hobbycraft",
-  //     value: 10.00,
-  //   })
-  //   console.log('REDEEM TEMPLATE ', redeemTemplate)
-  //
-  //   assert.ok(redeemTemplate)
-  // })
+    assert.ok(list.length > 0)
+  })
+
+  test('list-brand', async () => {
+    if (!CONFIG.TILLO_API_KEY) return;
+    const seneca = await makeSeneca()
+
+    const list = await seneca.entity("provider/tillo/brand").list$({
+      detail: true,
+      currency: "GBP",
+      country: "GB"
+    })
+    console.log('BRANDS', list)
+
+    assert.ok(list.length > 0)
+  })
+
+  test('issue-gc', async () => {
+    if (!CONFIG.TILLO_API_KEY) return;
+    const seneca = await makeSeneca()
+
+    const redeemTemplate = await seneca.entity("provider/tillo/dgc").save$({
+      user_id: "user01",
+      brand: "hobbycraft",
+      value: 10.00,
+    })
+    console.log('REDEEM TEMPLATE ', redeemTemplate)
+
+    assert.ok(redeemTemplate)
+  })
 })
 
 async function makeSeneca() {
@@ -109,27 +109,12 @@ async function makeSeneca() {
     .test()
     .use('promisify')
     .use('entity')
-    .use('env', {
-      // debug: true,
-      file: [path.join(testDir, 'local-config.js') + ';?'],
-      var: {
-        $TILLO_API_KEY: String,
-        $TILLO_SECRET: String,
-      },
-      // Provide fallback values for CI where secrets may not be available.
-      process: {
-        env: {
-          TILLO_API_KEY: 'test-api-key',
-          TILLO_SECRET: 'test-secret',
-        },
-      },
-    })
     .use('provider', {
       provider: {
         tillo: {
           keys: {
-            apikey: { value: '$TILLO_API_KEY' },
-            secret: { value: '$TILLO_SECRET' },
+            apikey: { value: CONFIG.TILLO_API_KEY },
+            secret: { value: CONFIG.TILLO_SECRET },
           },
         },
       },

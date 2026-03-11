@@ -1,6 +1,6 @@
 {
   "name": "@seneca/tillo-provider",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "main": "dist/TilloProvider.js",
   "type": "commonjs",
   "types": "dist/TilloProvider.d.ts",

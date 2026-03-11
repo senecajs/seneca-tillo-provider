@@ -101,6 +101,37 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
           }
         }
       },
+      // Check available float balances per currency.
+      // Tillo API: GET /check-floats
+      float: {
+        cmd: {
+          list: {
+            action: async function(this: any, entize: any, msg: any) {
+              const path = "check-floats"
+              const timestamp = new Date().getTime().toString()
+
+              const signData: Map<string, string> = new Map([
+                ["apikey", this.shared.headers["API-Key"]],
+                ["method", "GET"],
+                ["path", path],
+                ["timestamp", timestamp],
+                ["apiSecret", this.shared.secret],
+              ])
+
+              this.shared.headers.Signature = getAuthSignature(signData)
+              this.shared.headers.Timestamp = timestamp
+
+              let json: any =
+                await getJSON(makeUrl(path, msg.q), makeConfig())
+              let floats = json.data.floats
+              let list = Object.entries(floats).map(
+                ([currency, value]: any) => entize({ currency, ...value })
+              )
+              return list
+            },
+          }
+        }
+      },
       dgc: {
         cmd: {
           save: {

@@ -43,6 +43,28 @@ describe('tillo-provider', () => {
   })
 
 
+  test('float-entity', async () => {
+    const seneca = await makeSeneca()
+
+    // Verify the float entity is registered and can be referenced.
+    const floatEntity = seneca.entity('provider/tillo/float')
+    expect(floatEntity).toBeDefined()
+    expect(floatEntity.entity$).toBe('provider/tillo/float')
+  })
+
+
+  // test('list-float', async () => {
+  //   if (!Config) return;
+  //   const seneca = await makeSeneca()
+  //
+  //   const list = await seneca.entity("provider/tillo/float").list$({
+  //     currency: "GBP",
+  //   })
+  //   console.log('FLOATS', list[0])
+  //
+  //   expect(list.length > 0).toBeTruthy()
+  // })
+
   // test('list-brand', async () => {
   //   if (!Config) return;
   //   const seneca = await makeSeneca()

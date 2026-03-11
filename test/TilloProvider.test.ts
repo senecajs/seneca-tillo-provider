@@ -116,6 +116,13 @@ async function makeSeneca() {
         $TILLO_API_KEY: String,
         $TILLO_SECRET: String,
       },
+      // Provide fallback values for CI where secrets may not be available.
+      process: {
+        env: {
+          TILLO_API_KEY: 'test-api-key',
+          TILLO_SECRET: 'test-secret',
+        },
+      },
     })
     .use('provider', {
       provider: {

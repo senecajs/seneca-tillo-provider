@@ -60,7 +60,7 @@ describe('tillo-provider', () => {
   //   const list = await seneca.entity("provider/tillo/float").list$({
   //     currency: "GBP",
   //   })
-  //   console.log('FLOATS', list)
+  //   console.log('FLOATS', list[0])
   //
   //   expect(list.length > 0).toBeTruthy()
   // })

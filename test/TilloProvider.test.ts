@@ -1,57 +1,67 @@
-/* Copyright © 2022 Seneca Project Contributors, MIT License. */
+/* Copyright © 2022-2026 Seneca Project Contributors, MIT License. */
 
+import { test, describe } from 'node:test'
+import { strict as assert } from 'node:assert'
+import path from 'path'
 import * as Fs from 'fs'
-
-// const Fetch = require('node-fetch')
-
 
 const Seneca = require('seneca')
 const SenecaMsgTest = require('seneca-msg-test')
 
-import TilloProvider from '../src/tillo-provider'
-import TilloProviderDoc from '../src/TilloProvider-doc'
+import TilloProvider from '../dist/TilloProvider.js'
+import TilloProviderDoc from '../dist/TilloProviderDoc.js'
 
-const BasicMessages = require('./basic.messages.js')
+const testDir = path.join(__dirname, '..', 'test')
 
+const BasicMessages = require(path.join(testDir, 'basic.messages.js'))
 
 // Only run some tests locally (not on Github Actions).
-let Config = undefined
-if (Fs.existsSync(__dirname + '/local-config.js')) {
-  Config = require('./local-config')
+let Config: any = undefined
+if (Fs.existsSync(path.join(testDir, 'local-config.js'))) {
+  Config = require(path.join(testDir, 'local-config'))
 }
 
-
-describe('tillo-provider', () => {
-
+describe('TilloProvider', () => {
   test('happy', async () => {
-    expect(TilloProvider).toBeDefined()
-    expect(TilloProviderDoc).toBeDefined()
-
     const seneca = await makeSeneca()
 
-    expect(await seneca.post('sys:provider,provider:tillo,get:info'))
-      .toMatchObject({
-        ok: true,
-        name: 'tillo',
-      })
-  })
+    assert.ok(TilloProvider)
+    assert.ok(TilloProviderDoc)
 
+    const info = await seneca.post('sys:provider,provider:tillo,get:info')
+    assert.equal(info.ok, true)
+    assert.equal(info.name, 'tillo')
+  })
 
   test('messages', async () => {
     const seneca = await makeSeneca()
-    await (SenecaMsgTest(seneca, BasicMessages)())
+    await SenecaMsgTest(seneca, BasicMessages)()
   })
-
 
   test('float-entity', async () => {
     const seneca = await makeSeneca()
 
     // Verify the float entity is registered and can be referenced.
     const floatEntity = seneca.entity('provider/tillo/float')
-    expect(floatEntity).toBeDefined()
-    expect(floatEntity.entity$).toBe('provider/tillo/float')
+    assert.ok(floatEntity)
+    assert.equal(floatEntity.entity$, 'provider/tillo/float')
   })
 
+  test('brand-entity', async () => {
+    const seneca = await makeSeneca()
+
+    const brandEntity = seneca.entity('provider/tillo/brand')
+    assert.ok(brandEntity)
+    assert.equal(brandEntity.entity$, 'provider/tillo/brand')
+  })
+
+  test('dgc-entity', async () => {
+    const seneca = await makeSeneca()
+
+    const dgcEntity = seneca.entity('provider/tillo/dgc')
+    assert.ok(dgcEntity)
+    assert.equal(dgcEntity.entity$, 'provider/tillo/dgc')
+  })
 
   // test('list-float', async () => {
   //   if (!Config) return;
@@ -62,7 +72,7 @@ describe('tillo-provider', () => {
   //   })
   //   console.log('FLOATS', list[0])
   //
-  //   expect(list.length > 0).toBeTruthy()
+  //   assert.ok(list.length > 0)
   // })
 
   // test('list-brand', async () => {
@@ -76,7 +86,7 @@ describe('tillo-provider', () => {
   //   })
   //   console.log('BRANDS', list)
   //
-  //   expect(list.length > 0).toBeTruthy()
+  //   assert.ok(list.length > 0)
   // })
 
   // test('issue-gc', async () => {
@@ -90,11 +100,9 @@ describe('tillo-provider', () => {
   //   })
   //   console.log('REDEEM TEMPLATE ', redeemTemplate)
   //
-  //   expect(redeemTemplate).toBeTruthy()
+  //   assert.ok(redeemTemplate)
   // })
-
 })
-
 
 async function makeSeneca() {
   const seneca = Seneca({ legacy: false })
@@ -103,11 +111,11 @@ async function makeSeneca() {
     .use('entity')
     .use('env', {
       // debug: true,
-      file: [__dirname + '/local-config.js;?'],
+      file: [path.join(testDir, 'local-config.js') + ';?'],
       var: {
         $TILLO_API_KEY: String,
         $TILLO_SECRET: String,
-      }
+      },
     })
     .use('provider', {
       provider: {
@@ -115,9 +123,9 @@ async function makeSeneca() {
           keys: {
             apikey: { value: '$TILLO_API_KEY' },
             secret: { value: '$TILLO_SECRET' },
-          }
-        }
-      }
+          },
+        },
+      },
     })
     .use(TilloProvider, {
       url: 'https://sandbox.tillo.dev/api/v2/',
@@ -125,4 +133,3 @@ async function makeSeneca() {
 
   return seneca.ready()
 }
-

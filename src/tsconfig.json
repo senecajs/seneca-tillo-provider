@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "noEmitOnError": true,
+    "outDir": "../dist",
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "ES2022"
+  },
+  "include": ["./**/*.ts"]
+}

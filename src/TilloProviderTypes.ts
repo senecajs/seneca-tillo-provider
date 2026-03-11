@@ -17,20 +17,10 @@ export type BrandListParams = {
   country?: string
 }
 
-export type BrandData = {
-  name: string
-  value: any
-}
-
 // Float Entity Types
 
 export type FloatListParams = {
   currency?: string
-}
-
-export type FloatData = {
-  currency: string
-  [key: string]: any
 }
 
 // Digital Gift Card Entity Types

@@ -4,7 +4,10 @@ import crypto from 'crypto'
 
 import type {
   TilloProviderOptions,
+  BrandListParams,
+  FloatListParams,
   DgcSaveParams,
+  DgcPayload,
 } from './TilloProviderTypes.js'
 
 const Pkg = require('../package.json')
@@ -70,6 +73,7 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
         cmd: {
           list: {
             action: async function (this: any, entize: any, msg: any) {
+              const q: BrandListParams = msg.q
               const path = 'brands'
               const timestamp = new Date().getTime().toString()
 
@@ -84,7 +88,7 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
               this.shared.headers.Signature = getAuthSignature(signData)
               this.shared.headers.Timestamp = timestamp
 
-              let json: any = await getJSON(makeUrl(path, msg.q), makeConfig())
+              let json: any = await getJSON(makeUrl(path, q), makeConfig())
               let brands = json.data.brands
               let list = Object.entries(brands).map(([name, value]: any) =>
                 entize({ name, value }),
@@ -100,6 +104,7 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
         cmd: {
           list: {
             action: async function (this: any, entize: any, msg: any) {
+              const q: FloatListParams = msg.q
               const path = 'check-floats'
               const timestamp = new Date().getTime().toString()
 
@@ -114,7 +119,7 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
               this.shared.headers.Signature = getAuthSignature(signData)
               this.shared.headers.Timestamp = timestamp
 
-              let json: any = await getJSON(makeUrl(path, msg.q), makeConfig())
+              let json: any = await getJSON(makeUrl(path, q), makeConfig())
               let floats = json.data.floats
               let list = Object.entries(floats).map(([currency, value]: any) =>
                 entize({ currency, ...value }),
@@ -159,21 +164,21 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
               this.shared.headers.Signature = getAuthSignature(signData)
               this.shared.headers.Timestamp = timestamp
 
+              const body: DgcPayload = {
+                client_request_id: clientRId,
+                brand: brand,
+                face_value: {
+                  amount: value,
+                  currency: curr,
+                },
+                delivery_method: 'url',
+                fulfilment_by: 'partner',
+                sector: sector || 'other',
+              }
+
               let json: any = await postJSON(
                 makeUrl('digital/issue'),
-                makeConfig({
-                  body: {
-                    client_request_id: clientRId,
-                    brand: brand,
-                    face_value: {
-                      amount: value,
-                      currency: curr,
-                    },
-                    delivery_method: 'url',
-                    fulfilment_by: 'partner',
-                    sector: sector || 'other',
-                  },
-                }),
+                makeConfig({ body }),
               )
 
               let order = json

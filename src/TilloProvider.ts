@@ -46,7 +46,7 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
 
   seneca.message('sys:provider,provider:tillo,get:info', get_info)
 
-  const makeConfig = (config?: any) =>
+  const makeConfig = (config?: Record<string, unknown>) =>
     seneca.util.deep(
       {
         headers: {
@@ -88,9 +88,9 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
               this.shared.headers.Signature = getAuthSignature(signData)
               this.shared.headers.Timestamp = timestamp
 
-              let json: any = await getJSON(makeUrl(path, q), makeConfig())
-              let brands = json.data.brands
-              let list = Object.entries(brands).map(([name, value]: any) =>
+              const json: Record<string, any> = await getJSON(makeUrl(path, q), makeConfig())
+              const brands = json.data.brands
+              const list = Object.entries(brands).map(([name, value]: [string, unknown]) =>
                 entize({ name, value }),
               )
               return list
@@ -119,9 +119,9 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
               this.shared.headers.Signature = getAuthSignature(signData)
               this.shared.headers.Timestamp = timestamp
 
-              let json: any = await getJSON(makeUrl(path, q), makeConfig())
-              let floats = json.data.floats
-              let list = Object.entries(floats).map(([currency, value]: any) =>
+              const json: Record<string, any> = await getJSON(makeUrl(path, q), makeConfig())
+              const floats: Record<string, Record<string, unknown>> = json.data.floats
+              const list = Object.entries(floats).map(([currency, value]) =>
                 entize({ currency, ...value }),
               )
               return list
@@ -176,12 +176,12 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
                 sector: sector || 'other',
               }
 
-              let json: any = await postJSON(
+              const json: Record<string, any> = await postJSON(
                 makeUrl('digital/issue'),
                 makeConfig({ body }),
               )
 
-              let order = json
+              const order = json
               return entize(order)
             },
           },

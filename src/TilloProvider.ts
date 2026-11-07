@@ -13,15 +13,10 @@ import type {
 const Pkg = require('../package.json')
 
 function generateAuthSign(signData: Map<string, string>) {
-  const sd = new Map(signData)
-  sd.delete('apiSecret')
-  const sdList: string[] = []
-
-  sd.forEach((v: string) => {
-    sdList.push(v)
-  })
-
-  return sdList.join('-')
+  return [...signData]
+    .filter(([k]) => k !== 'apiSecret')
+    .map(([, v]) => v)
+    .join('-')
 }
 
 function getAuthSignature(signData: Map<string, string>) {
@@ -46,7 +41,7 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
 
   seneca.message('sys:provider,provider:tillo,get:info', get_info)
 
-  const makeConfig = (config?: any) =>
+  const makeConfig = (config?: Record<string, unknown>) =>
     seneca.util.deep(
       {
         headers: {
@@ -88,9 +83,12 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
               this.shared.headers.Signature = getAuthSignature(signData)
               this.shared.headers.Timestamp = timestamp
 
-              let json: any = await getJSON(makeUrl(path, q), makeConfig())
-              let brands = json.data.brands
-              let list = Object.entries(brands).map(([name, value]: any) =>
+              const json: Record<string, any> = await getJSON(makeUrl(path, q), makeConfig())
+              if (null == json.data?.brands) {
+                throw this.fail('invalid-response')
+              }
+              const brands = json.data.brands
+              const list = Object.entries(brands).map(([name, value]: [string, unknown]) =>
                 entize({ name, value }),
               )
               return list
@@ -119,9 +117,12 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
               this.shared.headers.Signature = getAuthSignature(signData)
               this.shared.headers.Timestamp = timestamp
 
-              let json: any = await getJSON(makeUrl(path, q), makeConfig())
-              let floats = json.data.floats
-              let list = Object.entries(floats).map(([currency, value]: any) =>
+              const json: Record<string, any> = await getJSON(makeUrl(path, q), makeConfig())
+              if (null == json.data?.floats) {
+                throw this.fail('invalid-response')
+              }
+              const floats: Record<string, Record<string, unknown>> = json.data.floats
+              const list = Object.entries(floats).map(([currency, value]) =>
                 entize({ currency, ...value }),
               )
               return list
@@ -142,6 +143,10 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
                 value,
                 sector,
               }: DgcSaveParams = msg.q
+
+              if (null == brand || null == value) {
+                throw this.fail('missing-params')
+              }
 
               const clientRId =
                 clientRequestId ||
@@ -176,12 +181,12 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
                 sector: sector || 'other',
               }
 
-              let json: any = await postJSON(
+              const json: Record<string, any> = await postJSON(
                 makeUrl('digital/issue'),
                 makeConfig({ body }),
               )
 
-              let order = json
+              const order = json
               return entize(order)
             },
           },
@@ -193,7 +198,11 @@ function TilloProvider(this: any, options: TilloProviderOptions) {
   seneca.prepare(async function (this: any) {
     let res = await this.post('sys:provider,get:keymap,provider:tillo')
 
-    if (!res.ok) {
+    if (
+      !res.ok ||
+      null == res.keymap?.apikey ||
+      null == res.keymap?.secret
+    ) {
       throw this.fail('keymap')
     }
 

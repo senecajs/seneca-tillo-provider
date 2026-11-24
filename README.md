@@ -18,15 +18,17 @@ Provides access to the Tillo API using the Seneca _provider_
 convention. Tillo API entities are represented as Seneca entities so
 that they can be accessed using the Seneca entity API and messages.
 
-See [seneca-entity](https://github.com/senecajs/seneca-entity) and the
+See [@seneca/entity](https://github.com/senecajs/seneca-entity) and the
 [Seneca Data Entities
 Tutorial](https://senecajs.org/docs/tutorials/understanding-data-entities.html)
 for more details on the Seneca entity API.
 
 ## Install
 
+Requires Seneca 4 and Node.js 24 or later.
+
 ```sh
-npm install @seneca/tillo-provider @seneca/provider @seneca/env seneca-entity seneca-promisify
+npm install seneca@^4 @seneca/entity @seneca/provider @seneca/env @seneca/tillo-provider
 ```
 
 ## Quick Example
@@ -35,16 +37,15 @@ npm install @seneca/tillo-provider @seneca/provider @seneca/env seneca-entity se
 // Setup - get the key value (<SECRET>) separately from a vault or
 // environment variable.
 const seneca = Seneca({ legacy: false })
-  .use('promisify')
-  .use('entity')
-  // Get API keys using the seneca-env plugin
-  .use('env', {
+  .use('@seneca/entity')
+  // Get API keys using the @seneca/env plugin
+  .use('@seneca/env', {
     var: {
       $TILLO_API_KEY: String,
       $TILLO_SECRET: String,
     },
   })
-  .use('provider', {
+  .use('@seneca/provider', {
     provider: {
       tillo: {
         keys: {
@@ -54,7 +55,7 @@ const seneca = Seneca({ legacy: false })
       },
     },
   })
-  .use('tillo-provider')
+  .use('@seneca/tillo-provider')
 
 await seneca.ready()
 
@@ -114,7 +115,7 @@ The Tillo API base URL. Include the trailing `/`. Point this at
 Set plugin options when loading with:
 
 ```js
-seneca.use('tillo-provider', { name: value, ... })
+seneca.use('@seneca/tillo-provider', { name: value, ... })
 ```
 
 <!--END:options-->
